@@ -1,4 +1,4 @@
-name: Test SSH Connection
+name: Deploy to Server
 
 on:
   push:
@@ -10,27 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H 98.93.5.11>> ~/.ssh/known_hosts
-      - name: Test SSH Connection
-        run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@98.93.5.11 "echo SSH is working!"
-          
-        
-          - name: Deploy to EC2
-          run: |
-          rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
-          --rsync-path="sudo rsync" ./ ubuntu@98.93.5.11:/var/www/myapp
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@98.93.5.11 "
-          sudo chown -R ubuntu:www-data /var/www/myapp &&
-          sudo chmod -R 775 /var/www/myapp &&
-          git config --global --add safe.directory /var/www/myapp &&
-          cd /var/www/myapp &&
-          composer install --no-dev --optimize-autoloader &&
-          sudo systemctl restart apache2
-          "
+    - name: Test SSH connection
+      run: ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@98.93.5.11 "echo SSH is working!"
+
+    - name: Run deploy script on server
+      run: |
+        ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@98.93.5.11 "
+          cd /var/www/devops_app &&
+          bash deploy.sh
+        "
