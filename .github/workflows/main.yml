@@ -23,9 +23,9 @@ jobs:
           - name: Deploy to EC2
           run: |
           rsync -avz -e "ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
-          --rsync-path="sudo rsync" ./ ubuntu@52.87.244.200:/var/www/myapp
+          --rsync-path="sudo rsync" ./ ubuntu@98.93.5.11:/var/www/myapp
 
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@52.87.244.200 "
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@98.93.5.11 "
           sudo chown -R ubuntu:www-data /var/www/myapp &&
           sudo chmod -R 775 /var/www/myapp &&
           git config --global --add safe.directory /var/www/myapp &&
